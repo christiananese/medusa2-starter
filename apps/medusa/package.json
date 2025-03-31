@@ -19,17 +19,16 @@
     "start": "medusa start",
     "dev": "medusa develop",
     "sync": "medusa db:sync-links",
-    "migrate:prod": "medusa db:migrate",
+    "migrate:prod": "pnpm run migrate && pnpm run sync",
     "start:prod": "medusa start",
-    "seed:prod": "medusa exec ./src/scripts/seed.js && yarn add-user:prod",
+    "seed:prod": "medusa exec ./src/scripts/seed.js && pnpm run add-user:prod",
     "add-user:prod": "medusa user --email admin@medusa-test.com --password supersecret && medusa user --email admin@lambdacurry.dev --password password",
     "migrate": "medusa db:migrate",
     "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
     "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
     "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
-    "medusa:init": "yarn run nukedb && medusa db:create --db medusa2 && yarn run migrate && yarn run sync && yarn run seed && yarn run add-user",
-    "add-user": "medusa user --email admin@medusa-test.com --password supersecret && medusa user --email admin@lambdacurry.dev --password password",
-    "typecheck": "tsc --noEmit"
+    "medusa:init": "pnpm run nukedb && medusa db:create --db medusa2 && pnpm run migrate && pnpm run sync && pnpm run seed && pnpm run add-user",
+    "add-user": "medusa user --email admin@medusa-test.com --password supersecret && medusa user --email admin@lambdacurry.dev --password password"
   },
   "dependencies": {
     "@lambdacurry/medusa-product-reviews": "0.0.6",

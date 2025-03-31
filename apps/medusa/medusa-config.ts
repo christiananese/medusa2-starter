@@ -6,6 +6,9 @@ const REDIS_URL = process.env.REDIS_URL;
 const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
 const IS_TEST = process.env.NODE_ENV === 'test';
 
+
+console.log("LOADING ENVS ", REDIS_URL, STRIPE_API_KEY, IS_TEST);
+
 const cacheModule = IS_TEST
   ? { resolve: '@medusajs/medusa/cache-inmemory' }
   : {

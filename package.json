@@ -2,10 +2,10 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "start": "turbo start",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
     "generate-env": "cp ./apps/medusa/.env.template ./apps/medusa/.env && cp ./apps/storefront/.env.template ./apps/storefront/.env",
     "medusa:init": "turbo run medusa:init --filter=medusa",
     "format": "turbo run format",
@@ -20,9 +20,5 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "yarn@4.5.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "packageManager": "pnpm@10.4.1"
 }

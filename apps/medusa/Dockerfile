@@ -1,44 +1,41 @@
-FROM node:20-alpine AS base
-
-RUN apk update && apk add --no-cache libc6-compat
+FROM public.ecr.aws/docker/library/node:20.9.0-alpine AS base
+RUN corepack enable
+RUN apk add --no-cache libc6-compat
+RUN corepack prepare pnpm@10.4.1 --activate
 
 WORKDIR /app
-
-FROM base AS builder
-
+# Copy root workspace files
+COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
+COPY package.json ./
+# Copy all workspace files for dependency resolution
 COPY . .
 
-RUN npx --yes turbo@2.1.2 prune --scope=medusa --docker
+FROM base AS build
+WORKDIR /app
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
 
-FROM base AS installer
+FROM public.ecr.aws/docker/library/node:20.9.0-slim AS final
+RUN apt-get update && apt-get install -y curl procps && apt-get clean
 
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/yarn.lock yarn.lock
-COPY --from=builder /app/.yarnrc.yml .yarnrc.yml
-COPY --from=builder /app/.yarn .yarn
+# Setup pnpm in the final stage
+RUN corepack enable
+RUN corepack prepare pnpm@10.4.1 --activate
 
-RUN yarn install
+ARG PROJECT_PATH
+WORKDIR /final/.medusa/server
 
-COPY --from=builder /app/out/full/ .
+# Copy necessary files for dependency installation
+COPY --from=build /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/package.json ./
+COPY --from=build /app/${PROJECT_PATH}/package.json ./package.json
+COPY --from=build /app/${PROJECT_PATH}/.medusa/server .
 
-RUN yarn turbo build --filter=medusa && \
-    rm -rf node_modules/.cache .yarn/cache
+# Install production dependencies
+RUN pnpm install --prod --frozen-lockfile
 
 
-FROM base AS runner
+EXPOSE 9000
 
-COPY --chown=node:node --from=installer /app/yarn.lock .
-COPY --chown=node:node --from=installer /app/.yarnrc.yml .yarnrc.yml
-COPY --chown=node:node --from=installer /app/.yarn .yarn
-COPY --chown=node:node --from=installer /app/apps/medusa/.medusa/server /app/server
-COPY --chown=node:node --from=installer /app/yarn.lock /app/server/yarn.lock
+ENTRYPOINT [ "/bin/bash", "-c", "npx medusa db:migrate --execute-all-links && if [[ ! -z ${USER_INITIAL_PASSWORD} ]]; then npx medusa user -e \"$USER_INITIAL_EMAIL\" -p \"$USER_INITIAL_PASSWORD\" || true; fi && node ./node_modules/.bin/medusa start"]
 
-RUN cd /app/server && yarn workspaces focus --production
-
-USER 1000
-
-WORKDIR /app/server
-
-ENV PORT=80
-
-CMD ["yarn", "start:prod"]
