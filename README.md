@@ -2,7 +2,7 @@
   <a href="https://barrio.lambdacurry.dev"><img src="https://barrio.lambdacurry.dev/favicon.svg" alt="Medusa 2 Starter with Remix Storefront" width="80" height="80"></a>
   <br>
   <br>
-  Medusa 2 Starter with Remix Storefront
+edusa 2 Starter with Remix Storefront
   <br>
 </h1>
 
@@ -113,7 +113,7 @@ In order to reset the database, follow the steps from 3 to 7 in the Local Develo
 To enable Express Checkout in the Medusa Storefront, follow these steps:
 
 1. Enable the payment methods you want to use to during Express Checkout in the Stripe [payment methods settings](https://dashboard.stripe.com/settings/payment_methods).
-   - Learn more about Apple Pay integration [here](https://docs.stripe.com/apple-pay) 
+   - Learn more about Apple Pay integration [here](https://docs.stripe.com/apple-pay)
    - Learn more about Google Pay integration [here](https://docs.stripe.com/google-pay).
 
 2. Create your own [domain association file](https://docs.stripe.com/apple-pay?platform=web#verify-domain) to verify your domain, and replace the content in the `apps/storefront/app/routes/[.well-known].apple-developer-merchantid-domain-association.tsx` file with your own domain association file content.
